@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/TV_update_to_premium"
+	android:text="@string/UpdateToPremiumMsg"
+	android:layout_width="match_parent"
+	android:textStyle="bold"
+	android:layout_height="64dp"
+	android:gravity="center"
+	android:background="@drawable/selectable_background"
+	android:clickable="true"
+	android:focusable="true"/>

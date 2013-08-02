@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">FreemiumLibrary</string>
+	<string name="UpdateToPremiumMsg">If you like this application,\n think about upgrading to premium!</string>
+	<string name="premium_failed">Too bad, you didn\'t buy the premium package!</string>
+	<string name="premium_thanks">Thanks for buying the premium version!</string>
+	<string name="SP_is_premium">is_premium</string>
+	<string name="action_premium">Upgrade to premium</string>
+	<string name="UpdateToPremium_list_item">Premium mode</string>
+	<string name="UpdateToPremium_list_item_details">Unlock exclusive features</string>
+
+</resources>

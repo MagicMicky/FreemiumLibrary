@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.ads.AdView
+			xmlns:android="http://schemas.android.com/apk/res/android"
+			xmlns:ads="http://schemas.android.com/apk/lib/com.google.ads"
+			android:id="@+id/ad_banner"
+			android:layout_alignParentBottom="true"
+			android:layout_width="320dp"
+			android:layout_height="50dp"
+			android:layout_gravity="center_horizontal"
+			android:gravity="center"
+			ads:adUnitId=""
+			ads:adSize="BANNER"
+			ads:testDevices="TEST_EMULATOR, 0E557AC2944D4369AAFD4EA392B2274C, D5FB2547F150FC4EA66A7234ECA423C2, 13065113B2B4B813D307F763A2A69105, A56AB84A664783F4A3D5249C058FBCCE, F3E066E5E4928CAC97BDB9B619FA29F9, 8BE348CB7AEB8287B0D26520511A2ED3"
+			ads:loadAdOnCreate="true"/>

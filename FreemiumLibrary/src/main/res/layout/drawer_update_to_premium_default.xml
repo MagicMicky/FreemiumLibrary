@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+		xmlns:android="http://schemas.android.com/apk/res/android"
+		android:id="@+id/update_to_premium"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:paddingLeft="16dp"
+		android:paddingRight="16dp"
+		android:background="@drawable/selectable_background"
+		android:minHeight="@dimen/list_preferred_item_height"
+		android:gravity="center_horizontal"
+		android:orientation="vertical"
+		android:clickable="true"
+		android:selectable="true">
+
+
+
+	<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/UpdateToPremium_list_item"
+			android:textAppearance="@android:style/TextAppearance.Medium.Inverse"
+			android:gravity="center_vertical"
+			android:textColor="#fff"/>
+	<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:textStyle="italic"
+			android:text="@string/UpdateToPremium_list_item_details"
+			android:textAppearance="@android:style/TextAppearance.Small.Inverse"
+			android:gravity="center_vertical"
+			android:textColor="@color/color_light_text"/>
+</LinearLayout>
