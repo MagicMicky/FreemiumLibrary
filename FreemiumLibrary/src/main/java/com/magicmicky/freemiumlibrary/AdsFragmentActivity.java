@@ -1,10 +1,10 @@
 package com.magicmicky.freemiumlibrary;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,7 +23,7 @@ import java.util.Set;
  * TODO: allow a personalisation of the MenuButton (let the user personalize the icon) see #setPremiumMenuButton
  * @author Mickael Goubin
  */
-public abstract class AdsFragmentActivity extends Activity {
+public abstract class AdsFragmentActivity extends FragmentActivity {
 
 	private static final int MENU_PREMIUM = Menu.FIRST + 100;
 	private static final String TAG = "UpdateToPremiumAct";
