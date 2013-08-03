@@ -1,7 +1,6 @@
 package com.magicmicky.freemiumlibrary;
 
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -51,11 +50,6 @@ public class AdsInstantiator implements AdListener {
 			container.addView(ad);
 			request.addTestDevice(AdRequest.TEST_EMULATOR);
 			ad.loadAd(request);
-			v = mViewToHide;
-			if(v!=null) {
-				v.setVisibility(View.GONE);
-				Log.d(TAG, "Removing premium link...");
-			}
 		}
 
 	}
@@ -70,8 +64,8 @@ public class AdsInstantiator implements AdListener {
 	public void onFailedToReceiveAd(Ad ad, AdRequest.ErrorCode errorCode) {
 		Log.v(TAG, "FAILED TO RECEIVE AD");
 		if(mViewToHide!=null) {
-			mViewToHide.setVisibility(View.VISIBLE);
-			Log.d(TAG, "premium link -> visible...");
+			if(mContainer.getChildCount()>0) mContainer.removeAllViews();
+			this.mContainer.addView(mViewToHide);
 		}
 	}
 

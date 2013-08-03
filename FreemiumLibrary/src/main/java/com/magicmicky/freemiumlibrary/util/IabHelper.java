@@ -280,7 +280,12 @@ public class IabHelper {
         mSetupDone = false;
         if (mServiceConn != null) {
             logDebug("Unbinding from service.");
-            if (mContext != null) mContext.unbindService(mServiceConn);
+			try {
+            	if (mContext != null) mContext.unbindService(mServiceConn);
+			} catch(Exception e) {
+				logError("Error unbinding service : in app not supported?");
+				e.printStackTrace();
+			}
             mServiceConn = null;
             mService = null;
             mPurchaseListener = null;
