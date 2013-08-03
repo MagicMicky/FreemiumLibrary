@@ -354,7 +354,7 @@ public abstract class AdsFragmentActivity extends Activity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		if(this.mPremiumMenuButton) {
+		if(this.mPremiumMenuButton && !isPremium()) {
 			menu.add(0, MENU_PREMIUM, 0, R.string.action_premium);
 		}
 		return true;
