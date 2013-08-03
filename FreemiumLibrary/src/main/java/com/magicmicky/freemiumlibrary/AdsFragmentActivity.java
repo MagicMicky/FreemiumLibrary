@@ -30,7 +30,6 @@ public abstract class AdsFragmentActivity extends FragmentActivity {
 	//private final String developerPayLoad="";
 	private IabHelper mHelper;
 	private static final int RC_REQUEST = 10001;
-	private boolean mIsPremium;
 	/*
 	 * Drawer
 	 */
@@ -55,6 +54,8 @@ public abstract class AdsFragmentActivity extends FragmentActivity {
 	/*
 	 * Other
 	 */
+	private boolean mInAppBillingSupported=true;
+	private boolean mIsPremium;
 	private String mBase64EncodedPublicKey;
 	private String mSkuPremium =null;
 	private Set<String> mTestDevices;
@@ -67,7 +68,13 @@ public abstract class AdsFragmentActivity extends FragmentActivity {
 	public boolean isPremium() {
 		return mIsPremium;
 	}
-
+	/**
+	 *
+	 * @return is in app billing supported for this device?
+	 */
+	public boolean isInAppBillingSupported() {
+		return this.mInAppBillingSupported;
+	}
 	/**
 	 * Whether or not you want to create a menu button to let the user see he can update to premium. Default is false.
 	 * <strong>Warning</strong>: When setting up this mode, you *NEED* to call {@code super.onCreateOptionsMenu()} and {@code super.onOptionsItemSelected()} at some points.
@@ -251,8 +258,7 @@ public abstract class AdsFragmentActivity extends FragmentActivity {
 				if (!result.isSuccess()) {
 					// Oh noes, there was a problem.
 					Log.e(TAG, "Problem setting up in-app billing: " + result);
-					AdsFragmentActivity.this.setPremiumMenuButton(false);
-					AdsFragmentActivity.this.setDrawerButton(false,0);
+					AdsFragmentActivity.this.setInAppBillingNotSupported(true);
 					return;
 				}
 
@@ -268,7 +274,7 @@ public abstract class AdsFragmentActivity extends FragmentActivity {
 		super.onResume();
 		this.mIsPremium=getPremiumFromPrefs();
 		if(!this.isPremium()) {
-			if(this.isPremiumMenuButton()) {
+			if(this.isPremiumMenuButton() && isInAppBillingSupported()) {
 				//Nothing to do
 				//Should check if calls to the super methods were done, but no way to do it properly...
 			}
@@ -277,7 +283,7 @@ public abstract class AdsFragmentActivity extends FragmentActivity {
 				this.doAds();
 			}
 
-			if(this.isDrawerButton()) {
+			if(this.isDrawerButton() && isInAppBillingSupported()) {
 				this.showDrawerButton();
 			}
 		}
@@ -289,6 +295,9 @@ public abstract class AdsFragmentActivity extends FragmentActivity {
 		}
 	}
 
+	private void setInAppBillingNotSupported(boolean inAppBillingNotSupported) {
+		this.mInAppBillingSupported = !inAppBillingNotSupported;
+	}
 
 
 	private void hideAdsContainer() {
@@ -356,7 +365,7 @@ public abstract class AdsFragmentActivity extends FragmentActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		if(this.mPremiumMenuButton && !isPremium()) {
+		if(this.mPremiumMenuButton && !isPremium() && isInAppBillingSupported()) {
 			menu.add(0, MENU_PREMIUM, 0, R.string.action_premium);
 		}
 		return true;
@@ -366,7 +375,7 @@ public abstract class AdsFragmentActivity extends FragmentActivity {
 	@Override
 	public  boolean onOptionsItemSelected(MenuItem item) {
 		Log.d("AdsFragmentActivity", "super.onOptionsItemSelected called!");
-		if(this.mPremiumMenuButton && !isPremium()) {
+		if(this.mPremiumMenuButton && !isPremium() && isInAppBillingSupported()) {
 			Log.d("AdsFragmentActivity", "and user not premium + premiummenubutton is on");
 
 			switch (item.getItemId()) {
