@@ -251,6 +251,8 @@ public abstract class AdsFragmentActivity extends FragmentActivity {
 				if (!result.isSuccess()) {
 					// Oh noes, there was a problem.
 					Log.e(TAG, "Problem setting up in-app billing: " + result);
+					AdsFragmentActivity.this.setPremiumMenuButton(false);
+					AdsFragmentActivity.this.setDrawerButton(false,0);
 					return;
 				}
 
