@@ -259,6 +259,7 @@ public abstract class AdsFragmentActivity extends FragmentActivity {
 
 	@Override
 	protected void onPostResume () {
+		super.onPostResume();
 		// Create the helper, passing it our context and the public key to verify signatures with
 		Log.d(TAG, "Creating IAB helper.");
 		mHelper = new IabHelper(this, mBase64EncodedPublicKey);
@@ -286,6 +287,10 @@ public abstract class AdsFragmentActivity extends FragmentActivity {
 
 			}
 		});
+
+		this.doStuff();
+	}
+	private void doStuff() {
 		if(!mIsPremiumInitialized) {
 			this.mIsPremium=getPremiumFromPrefs();
 		}
@@ -309,8 +314,8 @@ public abstract class AdsFragmentActivity extends FragmentActivity {
 			if(isDrawerButton())
 				this.hideDrawerButtonContainer();
 		}
+		this.invalidateOptionsMenu();
 	}
-
 	private void setInAppBillingNotSupported(boolean inAppBillingNotSupported) {
 		this.mInAppBillingSupported = !inAppBillingNotSupported;
 	}
@@ -419,7 +424,6 @@ public abstract class AdsFragmentActivity extends FragmentActivity {
 		}
 
 		Log.d(TAG, "Upgrade button clicked; launching purchase flow for upgrade.");
-		//TODO:		setWaitScreen(true);
 
 		mHelper.launchPurchaseFlow(this, mSkuPremium, RC_REQUEST,
 				mPurchaseFinishedListener, "");
@@ -474,13 +478,15 @@ public abstract class AdsFragmentActivity extends FragmentActivity {
 		this.mIsPremium=isPremium;
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(AdsFragmentActivity.this);
 		prefs.edit().putBoolean(getString(R.string.SP_is_premium),isPremium).commit();
-		if(isPremium) {
+		/*if(isPremium) {
 			ViewGroup adsContainer = (ViewGroup) this.findViewById(this.getAdsContainerRes());
 			adsContainer.removeAllViews();
-		}
+		}*/
+		this.doStuff();
 	}
 
 	private boolean getPremiumFromPrefs() {
+		this.mIsPremiumInitialized=true;
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(AdsFragmentActivity.this);
 		return prefs.getBoolean(getString(R.string.SP_is_premium),false);
 	}
