@@ -173,7 +173,12 @@ public class IabHelper {
     public void enableDebugLogging(boolean enable) {
         mDebugLog = enable;
     }
-
+	/**
+	 * Change the signature
+	 */
+	public void changeSignatureBase64(String signatureBase64) {
+		this.mSignatureBase64 = signatureBase64;
+	}
     /**
      * Callback for setup process. This listener's {@link #onIabSetupFinished} method is called
      * when the setup process is complete.
