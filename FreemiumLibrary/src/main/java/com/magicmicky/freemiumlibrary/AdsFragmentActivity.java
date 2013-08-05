@@ -1,5 +1,6 @@
 package com.magicmicky.freemiumlibrary;
 
+
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -56,6 +57,7 @@ public abstract class AdsFragmentActivity extends FragmentActivity {
 	 */
 	private boolean mInAppBillingSupported=true;
 	private boolean mIsPremium;
+	private boolean mIsPremiumInitialized=false;//To check if mIsPremium has been initialized
 	private String mBase64EncodedPublicKey;
 	private String mSkuPremium =null;
 	private Set<String> mTestDevices;
@@ -66,6 +68,9 @@ public abstract class AdsFragmentActivity extends FragmentActivity {
 	 * @return true if the user is a premium user, false otherwise
 	 */
 	public boolean isPremium() {
+		if(!mIsPremiumInitialized) {
+			this.mIsPremium = getPremiumFromPrefs();
+		}
 		return mIsPremium;
 	}
 	/**
@@ -215,6 +220,10 @@ public abstract class AdsFragmentActivity extends FragmentActivity {
 	 */
 	public void setAppPublicKey(String base64EncodedPublicKey) {
 		this.mBase64EncodedPublicKey = base64EncodedPublicKey;
+		if(mHelper != null) {
+			mHelper.changeSignatureBase64(base64EncodedPublicKey);
+			Log.d(TAG, "changed signature base 64");
+		}
 	}
 
 	/**
@@ -241,6 +250,15 @@ public abstract class AdsFragmentActivity extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.updatetopremium);
 
+
+	}
+	@Override
+	protected void onResume() {
+		super.onResume();
+	}
+
+	@Override
+	protected void onPostResume () {
 		// Create the helper, passing it our context and the public key to verify signatures with
 		Log.d(TAG, "Creating IAB helper.");
 		mHelper = new IabHelper(this, mBase64EncodedPublicKey);
@@ -268,11 +286,9 @@ public abstract class AdsFragmentActivity extends FragmentActivity {
 
 			}
 		});
-	}
-	@Override
-	protected void onResume() {
-		super.onResume();
-		this.mIsPremium=getPremiumFromPrefs();
+		if(!mIsPremiumInitialized) {
+			this.mIsPremium=getPremiumFromPrefs();
+		}
 		if(!this.isPremium()) {
 			if(this.isPremiumMenuButton() && isInAppBillingSupported()) {
 				//Nothing to do
@@ -357,7 +373,7 @@ public abstract class AdsFragmentActivity extends FragmentActivity {
 
 			upgradeMessage.setOnClickListener(new View.OnClickListener() {
 				@Override public void onClick(View view) {
-						onUpgrade();
+					onUpgrade();
 				}
 			});
 		}
@@ -380,7 +396,7 @@ public abstract class AdsFragmentActivity extends FragmentActivity {
 
 			switch (item.getItemId()) {
 				case MENU_PREMIUM:
-						onUpgrade();
+					onUpgrade();
 					break;
 			}
 		}
