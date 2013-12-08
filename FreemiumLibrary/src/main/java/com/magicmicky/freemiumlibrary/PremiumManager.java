@@ -193,13 +193,18 @@ public class PremiumManager {
                 throw(new PremiumModeException.WrongLayoutException(true));
             }
             messageContainer.removeAllViews();
-            View upgradeMessage ;
+            View upgradeMessage =null;
             try {
                 upgradeMessage = mActivity.getLayoutInflater().inflate(drawerButtonLayoutReference, messageContainer, true);
 
-            } catch(Exception e) {
-                upgradeMessage = mActivity.getLayoutInflater().inflate((R.layout.drawer_update_to_premium_default), messageContainer, false);
+            } catch(InflateException e) {
+                Log.w(TAG, "Catched Exception while trying to get layout " + adsReplacementLayoutRes + ": "+ e.getMessage());
+                e.printStackTrace();
             }
+            if(upgradeMessage==null) {
+                upgradeMessage = mActivity.getLayoutInflater().inflate(R.layout.drawer_update_to_premium_default, messageContainer, false);
+            }
+			
             if(upgradeMessage!=null) {
                 messageContainer.addView(upgradeMessage);
 
