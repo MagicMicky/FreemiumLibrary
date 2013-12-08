@@ -48,10 +48,12 @@ public class AdsInstantiator implements AdListener {
 			container.removeAllViews();
 			ad.setAdListener(this);
 			AdRequest request = new AdRequest();
-			request.setTestDevices(mTestDevices);
+			if(mTestDevices!=null)
+                request.setTestDevices(mTestDevices);
 			request.addTestDevice(AdRequest.TEST_EMULATOR);
 			ad.loadAd(request);
-			container.addView(ad);		}
+			container.addView(ad);
+        }
 
 	}
 

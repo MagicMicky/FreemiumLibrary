@@ -12,8 +12,8 @@ public class PremiumModeException extends RuntimeException {
 
 	public static class WrongLayoutException extends PremiumModeException {
 
-		public WrongLayoutException(boolean isDrawer) {
-			super(isDrawer  ? ("The resource given wasn't found in the drawer") : ("No layout were found for the ads"));
+		public WrongLayoutException(boolean isUpdateButton) {
+			super(isUpdateButton  ? ("The resource given wasn't found") : ("No layout were found for the ads"));
 		}
 	}
 

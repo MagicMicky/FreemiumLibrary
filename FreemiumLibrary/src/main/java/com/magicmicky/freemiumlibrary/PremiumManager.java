@@ -30,18 +30,19 @@ public abstract class PremiumManager {
     //private final String developerPayLoad="";
 	private IabHelper mHelper;
 	private static final int RC_REQUEST = 10001;
+
 	/*
 	 * Drawer
 	 */
 	private boolean mDrawerButton =false;
 	private int mDrawerButtonContainerRes;
-	private View mDrawerButtonView;
+	private int mdrawerButtonLayoutReference;
 
 	/*
 	 * Ads
 	 */
     private boolean mDoAds=false;
-	private View mAdsReplacement=null;
+    private int adsReplacementLayoutRes;
 	private int mAdsContainerRes;
 	private String mAdUnitId;
     private boolean mUpgradeLinkOnFailure;
@@ -52,8 +53,9 @@ public abstract class PremiumManager {
 	 */
 	private boolean mPremiumMenuButton =false;
     private Menu mMenu;
+    private int mMenuButtonTextResource;
 
-	/*
+    /*
 	 * Other
 	 */
 	private boolean mInAppBillingSupported=true;
@@ -64,6 +66,14 @@ public abstract class PremiumManager {
 	private Set<String> mTestDevices;
     private final Activity mActivity;
 
+    /**
+     * Instantiate a PremiumManager.
+     * @param activity the activity you start the instantiator from
+     * @param premiumPackageId your app's premium package "Sku" id
+     * @param appPublicKey your app's publicKey
+     * @param adId your adId
+     * @param testDevices a Set of your test devices ids
+     */
     public PremiumManager(Activity activity, String premiumPackageId,String appPublicKey, String adId, Set<String> testDevices) {
         this.mActivity = activity;
         this.mSkuPremium = premiumPackageId;
@@ -117,15 +127,18 @@ public abstract class PremiumManager {
 	public boolean isInAppBillingSupported() {
 		return this.mInAppBillingSupported;
 	}
-	/**
-	 * Whether or not you want to show ads for non premium user. Requires a viewgroup named "adView".
-	 * @param adsViewGroupRes the viewgroup you want the ads in.
-	 * @param upgradeLinkOnFailure whether or not you want to put a textview to replace the ad and link to the upgrade
-	 */
-	public void doAdsForNonPremium(int adsViewGroupRes, boolean upgradeLinkOnFailure) {
+
+    /**
+     * Show ads for non-premium users.
+     * @param adsViewGroupRes the Res reference to the container of your ads.
+     * @param upgradeLinkOnFailure whether or not you want to have an "upgrade" link if the ad requests fail (i.e. the user has an ad blocker, or don't have internet)
+     * @param adsReplacementLayoutRes the resources to the layout you want to use when you can't show ads
+     */
+	public void doAdsForNonPremium(int adsViewGroupRes, boolean upgradeLinkOnFailure, int adsReplacementLayoutRes) {
         this.mDoAds = true;
         this.mAdsContainerRes = adsViewGroupRes;
         this.mUpgradeLinkOnFailure = upgradeLinkOnFailure;
+        this.adsReplacementLayoutRes = adsReplacementLayoutRes;
         ViewGroup adsContainer = (ViewGroup) mActivity.findViewById(adsViewGroupRes);
         if(!isPremium()) {
             Log.d(TAG, "user is not premium: instantiating adds");
@@ -135,9 +148,8 @@ public abstract class PremiumManager {
             }
             adsContainer.removeAllViews();
             if (upgradeLinkOnFailure) {
-                if(mAdsReplacement!=null) {
-                    adsReplacement = mAdsReplacement;
-                } else {
+                adsReplacement = mActivity.getLayoutInflater().inflate(adsReplacementLayoutRes, adsContainer, true);
+                if(adsReplacement==null) {
                     adsReplacement = mActivity.getLayoutInflater().inflate(R.layout.ads_replacement_default,adsContainer, false);
                 }
 
@@ -159,11 +171,17 @@ public abstract class PremiumManager {
         }
 
 	}
-    //TODO: use res instead of view?
-    public void doDrawerButtonForNonPremium(int drawerButtonViewGroupRes, View drawerButtonView) throws PremiumModeException.WrongLayoutException{
+
+    /**
+     * Show a "Update to Premium" button for non premium users
+     * @param drawerButtonViewGroupRes the Resource Layout for the button container
+     * @param drawerButtonLayoutReference the Resource Layout for the button. Will be ignored if you want default look.
+     * @throws PremiumModeException.WrongLayoutException
+     */
+    public void doUpdateButtonForNonPremium(int drawerButtonViewGroupRes, int drawerButtonLayoutReference) throws PremiumModeException.WrongLayoutException{
         this.mDrawerButton = true;
         this.mDrawerButtonContainerRes = drawerButtonViewGroupRes;
-        this.mDrawerButtonView = drawerButtonView;
+        this.mdrawerButtonLayoutReference = drawerButtonLayoutReference;
         if(!isPremium()) {
             ViewGroup messageContainer = (ViewGroup) mActivity.findViewById(mDrawerButtonContainerRes);
             if(messageContainer== null) {
@@ -171,10 +189,11 @@ public abstract class PremiumManager {
             }
             messageContainer.removeAllViews();
             View upgradeMessage ;
-            if(this.mDrawerButtonView == null) {
+            try {
+                upgradeMessage = mActivity.getLayoutInflater().inflate(drawerButtonLayoutReference, messageContainer, true);
+
+            } catch(Exception e) {
                 upgradeMessage = mActivity.getLayoutInflater().inflate((R.layout.drawer_update_to_premium_default), messageContainer, false);
-            } else {
-                upgradeMessage = mDrawerButtonView;
             }
             if(upgradeMessage!=null) {
                 messageContainer.addView(upgradeMessage);
@@ -186,14 +205,27 @@ public abstract class PremiumManager {
                 });
             }
         } else {
-            hideDrawerButtonContainer();
+            hideUpgradeButtonContainer();
         }
     }
-    public void doPremiumButtonInMenu(Menu menu) {
+
+    /**
+     * Show an "Upgrade to premium" button in the menu.
+     * @param menu the menu instance to modify.
+     * @param textResource the String Resource (i.e. R.string.omg) to the text to show.
+     */
+    public void doPremiumButtonInMenu(Menu menu, int textResource) {
         this.mPremiumMenuButton = true;
         this.mMenu = menu;
+        this.mMenuButtonTextResource = textResource;
         if(!isPremium() && isInAppBillingSupported()) {
-            MenuItem updateMenuItem = menu.add(0, MENU_PREMIUM, 0, R.string.action_premium);
+            MenuItem updateMenuItem;
+            if(textResource!=0) {
+                updateMenuItem = menu.add(0, MENU_PREMIUM, 0, textResource);
+            } else {
+                updateMenuItem= menu.add(0, MENU_PREMIUM, 0, R.string.action_premium);
+            }
+
             updateMenuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
@@ -206,6 +238,20 @@ public abstract class PremiumManager {
         }
     }
 
+    /**
+     * Clean everything. Should be called in your activities onDestroy()
+     */
+    public void clean() {
+        Log.d(TAG, "Destroying helper.");
+        if (mHelper != null) mHelper.dispose();
+        mHelper = null;
+
+    }
+
+    /**
+     * Upgrade the user to premium, or downgrade him to not premium.
+     * @param isPremium whether or not the user is premium
+     */
     private void updatePremium(boolean isPremium) {
         this.mIsPremium=isPremium;
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mActivity);
@@ -213,39 +259,43 @@ public abstract class PremiumManager {
 
         //	this.doStuff();
         if(this.mPremiumMenuButton) {
-            doPremiumButtonInMenu(mMenu);
+            doPremiumButtonInMenu(mMenu, mMenuButtonTextResource);
         }
         if(this.mDrawerButton) {
-            doDrawerButtonForNonPremium(mDrawerButtonContainerRes, mDrawerButtonView);
+            doUpdateButtonForNonPremium(mDrawerButtonContainerRes, mdrawerButtonLayoutReference);
         }
         if(this.mDoAds) {
-            doAdsForNonPremium(mAdsContainerRes,mUpgradeLinkOnFailure);
+            doAdsForNonPremium(mAdsContainerRes,mUpgradeLinkOnFailure, adsReplacementLayoutRes);
         }
     }
 
 
-
-
+    /**
+     * set whether or not in app billing is supported
+     * @param inAppBillingNotSupported whether or not in app billing is supported
+     */
 	private void setInAppBillingNotSupported(boolean inAppBillingNotSupported) {
 		this.mInAppBillingSupported = !inAppBillingNotSupported;
 	}
 
-
+    /**
+     * Hide the ads container
+     */
 	private void hideAdsContainer() {
 		mActivity.findViewById(this.mAdsContainerRes).setVisibility(View.GONE);
 	}
 
-	protected  void hideDrawerButtonContainer() {
+    /**
+     * Hide the Upgrade button container
+     */
+	protected  void hideUpgradeButtonContainer() {
         mActivity.findViewById(this.mDrawerButtonContainerRes).setVisibility(View.GONE);
 	}
 
-	public void clean() {
-		Log.d(TAG, "Destroying helper.");
-		if (mHelper != null) mHelper.dispose();
-		mHelper = null;
-
-	}
-
+    /**
+     * Launch the Upgrade workflow
+     * @throws PremiumModeException.PremiumPackageIdError
+     */
 	protected void onUpgrade() throws PremiumModeException.PremiumPackageIdError{
 		if(mSkuPremium ==null) {
 			throw new PremiumModeException.PremiumPackageIdError();
@@ -257,8 +307,9 @@ public abstract class PremiumManager {
 	}
 
 
-
-	// Callback for when a purchase is finished
+    /**
+     * Callback when a purchase is finished.
+     */
 	private final IabHelper.OnIabPurchaseFinishedListener mPurchaseFinishedListener = new IabHelper.OnIabPurchaseFinishedListener() {
 		public void onIabPurchaseFinished(IabResult result, Purchase purchase) {
 			Log.d(TAG, "Purchase finished: " + result + ", purchase: " + purchase);
@@ -279,7 +330,9 @@ public abstract class PremiumManager {
 		}
 	};
 
-	// Listener that's called when we finish querying the items and subscriptions we own
+    /**
+     * Listener that's called when we finish querying the items and subscriptions we own
+     */
 	private final IabHelper.QueryInventoryFinishedListener mGotInventoryListener = new IabHelper.QueryInventoryFinishedListener() {
 
 		public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
@@ -300,8 +353,10 @@ public abstract class PremiumManager {
 	};
 
 
-
-
+    /**
+     * Retrieve whether or not the user is premium from the preferences
+     * @return whether or not the user is premium
+     */
 	private boolean getPremiumFromPrefs() {
 		this.mIsPremiumInitialized=true;
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mActivity);
