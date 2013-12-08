@@ -53,7 +53,7 @@ public class PremiumManager {
 	 */
 	private boolean mPremiumMenuButton =false;
     private Menu mMenu;
-    private int mMenuButtonTextResource;
+    private String mMenuButtonTextResource;
 
     /*
 	 * Other
@@ -222,16 +222,16 @@ public class PremiumManager {
     /**
      * Show an "Upgrade to premium" button in the menu.
      * @param menu the menu instance to modify.
-     * @param textResource the String Resource (i.e. R.string.omg) to the text to show.
+     * @param menuButtonText the text to show in the menu.
      */
-    public void doPremiumButtonInMenu(Menu menu, int textResource) {
+    public void doPremiumButtonInMenu(Menu menu, String menuButtonText) {
         this.mPremiumMenuButton = true;
         this.mMenu = menu;
-        this.mMenuButtonTextResource = textResource;
+        this.mMenuButtonTextResource = menuButtonText;
         if(!isPremium() && isInAppBillingSupported()) {
             MenuItem updateMenuItem;
-            if(textResource!=0) {
-                updateMenuItem = menu.add(0, MENU_PREMIUM, 0, textResource);
+            if(menuButtonText!=null) {
+                updateMenuItem = menu.add(0, MENU_PREMIUM, 0, menuButtonText);
             } else {
                 updateMenuItem= menu.add(0, MENU_PREMIUM, 0, R.string.action_premium);
             }
