@@ -1,5 +1,6 @@
 package com.magicmicky.freemiumlibrary;
 
+import android.app.Activity;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,13 +18,13 @@ import java.util.Set;
  */
 public class AdsInstantiator implements AdListener {
 	private static final String TAG = "AdsInstantiator";
-	private final AdsFragmentActivity mContext;
+	private final Activity mContext;
 	private final String mAdUnitId;
 	private final Set<String> mTestDevices;
 	private ViewGroup mContainer;
 	private View mViewToHide;
 
-	public AdsInstantiator(AdsFragmentActivity context, String adUnitId, View viewToHide, Set<String> testDevices) {
+	public AdsInstantiator(Activity context, String adUnitId, View viewToHide, Set<String> testDevices) {
 		this.mContext = context;
 		this.mViewToHide = viewToHide;
 		this.mAdUnitId=adUnitId;
@@ -56,7 +57,6 @@ public class AdsInstantiator implements AdListener {
 
 	@Override
 	public void onReceiveAd(Ad ad) {
-
 
 	}
 
