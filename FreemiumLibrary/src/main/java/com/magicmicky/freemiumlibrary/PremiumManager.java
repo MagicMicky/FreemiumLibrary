@@ -2,14 +2,9 @@ package com.magicmicky.freemiumlibrary;
 
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -55,6 +50,7 @@ public abstract class PremiumManager {
 	 * MenuButton
 	 */
 	private boolean mPremiumMenuButton =false;
+    private Menu mMenu;
 
 	/*
 	 * Other
@@ -158,13 +154,17 @@ public abstract class PremiumManager {
             adsContainer.setVisibility(View.VISIBLE);
             customAdsInstantiator.addAdsTo(adsContainer);
         } else {
-            adsContainer.setVisibility(View.GONE);
+            hideAdsContainer();
         }
 
 	}
-    public void doDrawerButotnForNonPremium(int drawerButtonViewGroupRes) throws PremiumModeException.WrongLayoutException{
+    //TODO: use res instead of view?
+    public void doDrawerButotnForNonPremium(int drawerButtonViewGroupRes, View drawerButtonView) throws PremiumModeException.WrongLayoutException{
+        this.mDrawerButton = true;
+        this.mDrawerButtonContainerRes = drawerButtonViewGroupRes;
+        this.mDrawerButtonView = drawerButtonView;
         if(!isPremium()) {
-            ViewGroup messageContainer = (ViewGroup) mActivity.findViewById(drawerButtonViewGroupRes);
+            ViewGroup messageContainer = (ViewGroup) mActivity.findViewById(mDrawerButtonContainerRes);
             if(messageContainer== null) {
                 throw(new PremiumModeException.WrongLayoutException(true));
             }
@@ -185,12 +185,12 @@ public abstract class PremiumManager {
                 });
             }
         } else {
-            ViewGroup messageContainer = (ViewGroup) mActivity.findViewById(drawerButtonViewGroupRes);
-            messageContainer.setVisibility(View.GONE);
+            hideDrawerButtonContainer();
         }
     }
     public void doPremiumButtonInMenu(Menu menu) {
         this.mPremiumMenuButton = true;
+        this.mMenu = menu;
         if(!isPremium() && isInAppBillingSupported()) {
             MenuItem updateMenuItem = menu.add(0, MENU_PREMIUM, 0, R.string.action_premium);
             updateMenuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
@@ -200,8 +200,29 @@ public abstract class PremiumManager {
                     return false;
                 }
             });
+        } else {
+            menu.removeItem(MENU_PREMIUM);
         }
     }
+
+    private void updatePremium(boolean isPremium) {
+        this.mIsPremium=isPremium;
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mActivity);
+        prefs.edit().putBoolean(mActivity.getString(R.string.SP_is_premium),isPremium).commit();
+
+        //	this.doStuff();
+        if(this.mPremiumMenuButton) {
+            doPremiumButtonInMenu(mMenu);
+        }
+        if(this.mDrawerButton) {
+            doDrawerButotnForNonPremium(mDrawerButtonContainerRes, mDrawerButtonView);
+        }
+        if(this.mDoAds) {
+            doAdsForNonPremium(mAdsContainerRes,mUpgradeLinkOnFailure);
+        }
+    }
+
+
      /*
 	 * Sets the test devices for the ad
 	 * @param testDevices a Set of the testdevices
@@ -211,32 +232,7 @@ public abstract class PremiumManager {
 	}*/
 
 
-	private void doStuff() {
-		if(!mIsPremiumInitialized) {
-			this.mIsPremium=getPremiumFromPrefs();
-		}
-	/*	if(!this.isPremium()) {
-			if(this.isPremiumMenuButton() && isInAppBillingSupported()) {
-				//Nothing to do
-				//Should check if calls to the super methods were done, but no way to do it properly...
-			}
 
-			if(this.isDoAdsForNonPremium()) {
-				this.doAds();
-			}
-
-			if(this.mDrawerButton && isInAppBillingSupported()) {
-				this.showDrawerButton();
-			}
-		}*/
-		else {
-			if(mDoAds)
-				this.hideAdsContainer();
-			if(mDrawerButton)
-				this.hideDrawerButtonContainer();
-		}
-		//this.invalidateOptionsMenu();
-	}
 	private void setInAppBillingNotSupported(boolean inAppBillingNotSupported) {
 		this.mInAppBillingSupported = !inAppBillingNotSupported;
 	}
@@ -250,22 +246,20 @@ public abstract class PremiumManager {
         mActivity.findViewById(this.mDrawerButtonContainerRes).setVisibility(View.GONE);
 	}
 
-	protected void clean() {
+	public void clean() {
 		Log.d(TAG, "Destroying helper.");
 		if (mHelper != null) mHelper.dispose();
 		mHelper = null;
 
 	}
 
-	// User clicked the "Upgrade to Premium" button.
+	//TODO: we should modify the helper so that it don't request an activity, and sends result in an asynctask instead of an onActivityResult
 	protected void onUpgrade() throws PremiumModeException.PremiumPackageIdError{
 		if(mSkuPremium ==null) {
 			throw new PremiumModeException.PremiumPackageIdError();
 		}
 
 		Log.d(TAG, "Upgrade button clicked; launching purchase flow for upgrade.");
-        AlertDialog.Builder bder = new AlertDialog.Builder(mActivity);
-        bder.create();
 		mHelper.launchPurchaseFlow(mActivity, mSkuPremium, RC_REQUEST,
 				mPurchaseFinishedListener, "");
 	}
@@ -315,16 +309,6 @@ public abstract class PremiumManager {
 
 
 
-	private void updatePremium(boolean isPremium) {
-		this.mIsPremium=isPremium;
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mActivity);
-		prefs.edit().putBoolean(mActivity.getString(R.string.SP_is_premium),isPremium).commit();
-		/*if(isPremium) {
-			ViewGroup adsContainer = (ViewGroup) this.findViewById(this.getAdsContainerRes());
-			adsContainer.removeAllViews();
-		}*/
-		this.doStuff();
-	}
 
 	private boolean getPremiumFromPrefs() {
 		this.mIsPremiumInitialized=true;
@@ -352,8 +336,5 @@ public abstract class PremiumManager {
 			Log.d(TAG, "onActivityResult handled by IABUtil.");
 		}
 	}*/
-
-
-
 
 }
