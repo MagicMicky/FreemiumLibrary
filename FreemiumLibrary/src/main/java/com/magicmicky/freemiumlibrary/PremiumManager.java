@@ -148,7 +148,12 @@ public class PremiumManager {
             }
             adsContainer.removeAllViews();
             if (upgradeLinkOnFailure) {
-                adsReplacement = mActivity.getLayoutInflater().inflate(adsReplacementLayoutRes, adsContainer, true);
+                try {
+                    adsReplacement = mActivity.getLayoutInflater().inflate(adsReplacementLayoutRes, adsContainer, true);
+                } catch(InflateException e) {
+                    Log.w(TAG, "Catched Exception while trying to get layout " + adsReplacementLayoutRes + ": "+ e.getMessage());
+                    e.printStackTrace();
+                }
                 if(adsReplacement==null) {
                     adsReplacement = mActivity.getLayoutInflater().inflate(R.layout.ads_replacement_default,adsContainer, false);
                 }
