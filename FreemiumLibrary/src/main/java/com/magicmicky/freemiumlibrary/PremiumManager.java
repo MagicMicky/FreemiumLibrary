@@ -64,11 +64,12 @@ public abstract class PremiumManager {
 	private Set<String> mTestDevices;
     private final Activity mActivity;
 
-    public PremiumManager(Activity activity, String premiumPackageId,String appPublicKey, String adId ) {
+    public PremiumManager(Activity activity, String premiumPackageId,String appPublicKey, String adId, Set<String> testDevices) {
         this.mActivity = activity;
         this.mSkuPremium = premiumPackageId;
         this.mBase64EncodedPublicKey = appPublicKey;
         this.mAdUnitId = adId;
+        this.mTestDevices = testDevices;
 
         // Create the helper, passing it our context and the public key to verify signatures with
         Log.d(TAG, "Creating IAB helper.");
@@ -122,10 +123,10 @@ public abstract class PremiumManager {
 	 * @param upgradeLinkOnFailure whether or not you want to put a textview to replace the ad and link to the upgrade
 	 */
 	public void doAdsForNonPremium(int adsViewGroupRes, boolean upgradeLinkOnFailure) {
+        this.mDoAds = true;
         this.mAdsContainerRes = adsViewGroupRes;
         this.mUpgradeLinkOnFailure = upgradeLinkOnFailure;
         ViewGroup adsContainer = (ViewGroup) mActivity.findViewById(adsViewGroupRes);
-
         if(!isPremium()) {
             Log.d(TAG, "user is not premium: instantiating adds");
             View adsReplacement=null;
@@ -159,7 +160,7 @@ public abstract class PremiumManager {
 
 	}
     //TODO: use res instead of view?
-    public void doDrawerButotnForNonPremium(int drawerButtonViewGroupRes, View drawerButtonView) throws PremiumModeException.WrongLayoutException{
+    public void doDrawerButtonForNonPremium(int drawerButtonViewGroupRes, View drawerButtonView) throws PremiumModeException.WrongLayoutException{
         this.mDrawerButton = true;
         this.mDrawerButtonContainerRes = drawerButtonViewGroupRes;
         this.mDrawerButtonView = drawerButtonView;
@@ -215,21 +216,13 @@ public abstract class PremiumManager {
             doPremiumButtonInMenu(mMenu);
         }
         if(this.mDrawerButton) {
-            doDrawerButotnForNonPremium(mDrawerButtonContainerRes, mDrawerButtonView);
+            doDrawerButtonForNonPremium(mDrawerButtonContainerRes, mDrawerButtonView);
         }
         if(this.mDoAds) {
             doAdsForNonPremium(mAdsContainerRes,mUpgradeLinkOnFailure);
         }
     }
 
-
-     /*
-	 * Sets the test devices for the ad
-	 * @param testDevices a Set of the testdevices
-	 */
-	/*public void setTestDevice(Set<String> testDevices) {
-		this.mTestDevices = testDevices;
-	}*/
 
 
 
