@@ -363,15 +363,25 @@ public class PremiumManager {
 	};
 
 
-    /**
+   /**
      * Retrieve whether or not the user is premium from the preferences
      * @return whether or not the user is premium
      */
 	private boolean getPremiumFromPrefs() {
 		this.mIsPremiumInitialized=true;
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mActivity);
-		return prefs.getBoolean(mActivity.getString(R.string.SP_is_premium),false);
+        return getPremiumFromPrefs(mActivity);
 	}
+
+    /**
+     * Retrieve whether or not the user is premium from the preferences
+     * @param c the current context
+     * @return whether or not the user is premium
+     */
+    public static boolean getPremiumFromPrefs(Context c) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
+        return prefs.getBoolean(c.getString(R.string.SP_is_premium),false);
+
+    }	
 
 	/**
      * This method needs to be called from your onActivityResult so that the transaction can happen.
