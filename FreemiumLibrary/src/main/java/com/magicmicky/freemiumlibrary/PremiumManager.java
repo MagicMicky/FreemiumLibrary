@@ -154,7 +154,7 @@ public abstract class PremiumManager {
                 }
             }
             //TODO: check if it's ok
-            AdsInstantiator customAdsInstantiator = new AdsInstantiator(this,mAdUnitId, adsReplacement, mTestDevices);
+            AdsInstantiator customAdsInstantiator = new AdsInstantiator(mActivity,mAdUnitId, adsReplacement, mTestDevices);
             adsContainer.setVisibility(View.VISIBLE);
             customAdsInstantiator.addAdsTo(adsContainer);
         } else {
