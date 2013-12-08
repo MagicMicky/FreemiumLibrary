@@ -2,6 +2,7 @@ package com.magicmicky.freemiumlibrary;
 
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -149,7 +150,6 @@ public abstract class PremiumManager {
                     });
                 }
             }
-            //TODO: check if it's ok
             AdsInstantiator customAdsInstantiator = new AdsInstantiator(mActivity,mAdUnitId, adsReplacement, mTestDevices);
             adsContainer.setVisibility(View.VISIBLE);
             customAdsInstantiator.addAdsTo(adsContainer);
@@ -253,7 +253,6 @@ public abstract class PremiumManager {
 
 	}
 
-	//TODO: we should modify the helper so that it don't request an activity, and sends result in an asynctask instead of an onActivityResult
 	protected void onUpgrade() throws PremiumModeException.PremiumPackageIdError{
 		if(mSkuPremium ==null) {
 			throw new PremiumModeException.PremiumPackageIdError();
@@ -315,26 +314,23 @@ public abstract class PremiumManager {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mActivity);
 		return prefs.getBoolean(mActivity.getString(R.string.SP_is_premium),false);
 	}
+
 	/**
-	 * If you override onActivityResult, don't forget to call super.onActivityResult() at some point
-	 * @param requestCode
-	 * @param resultCode
-	 * @param data
+     * This method needs to be called from your onActivityResult so that the transaction can happen.
+     * @param requestCode the requestCode from Activity#onActivityResult
+	 * @param resultCode the resultCode from Activity#onActivityResult
+	 * @param data the data from Activity#onActivityResult
+     * @return Returns true if the result was related to a purchase flow and was handled; false if the result was not related to a purchase, in which case you should handle it normally.
 	 */
-	/*@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	public boolean handleResult(int requestCode, int resultCode, Intent data) {
 		Log.d(TAG, "onActivityResult(" + requestCode + "," + resultCode + "," + data);
 
 		// Pass on the activity result to the helper for handling
-		if (!mHelper.handleActivityResult(requestCode, resultCode, data)) {
-			// not handled, so handle it ourselves (here's where you'd
-			// perform any handling of activity results not related to in-app
-			// billing...
-            mActivity.onActivityResult(requestCode, resultCode, data);
-		}
-		else {
-			Log.d(TAG, "onActivityResult handled by IABUtil.");
-		}
-	}*/
+        // not handled, so handle it ourselves (here's where you'd
+        // perform any handling of activity results not related to in-app
+        // billing...
+        //mActivity.onActivityResult(requestCode, resultCode, data);
+        return !mHelper.handleActivityResult(requestCode, resultCode, data);
+	}
 
 }
