@@ -23,7 +23,7 @@ import java.util.Set;
  * TODO: allow a personalisation of the MenuButton (let the user personalize the icon) see #setPremiumMenuButton
  * @author Mickael Goubin
  */
-public abstract class PremiumManager {
+public class PremiumManager {
 
 	private static final int MENU_PREMIUM = Menu.FIRST + 100;
 	private static final String TAG = "UpdateToPremiumAct";
