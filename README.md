@@ -41,7 +41,6 @@ Finally, you'll have to clean the PremiumManager in your activity's onDestroy ca
 
 ```java
 	protected void onDestroy() {
-		Crouton.cancelAllCroutons();
 		super.onDestroy();
         if(mPremiumManager != null)
             mPremiumManager.clean();
@@ -97,13 +96,18 @@ This method will require the following arguments:
 ## More advanced use.
 You also have access to other methods that could be useful in other cases.
 
-```java public boolean isPremium()
+```java
+public boolean isPremium()
 ``` will tell you if the user is premium or not. Thanks to it, you will be able to select features you want to activate only for premium users.
 
-```java public static boolean getPremiumFromPrefs(Context c)``` will let you get the premium information for the preferences.
+```java
+public static boolean getPremiumFromPrefs(Context c)
+``` will let you get the premium information for the preferences.
 It could be useful to use it in a widget or somewhere you don't want to instance a PremiumManager.
 
-Finally, ```java public boolean isInAppBillingSupported()``` will tell you whether or not the user's device support InAppBilling.
+Finally, ```
+java public boolean isInAppBillingSupported()
+``` will tell you whether or not the user's device support InAppBilling.
 
 ##Use case.
 The library is currently used in my HabitRPG application. You can find it on the [Google Play Store](https://play.google.com/store/apps/details?id=com.magicmicky.habitrpgmobileapp)
