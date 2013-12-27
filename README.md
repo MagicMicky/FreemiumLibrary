@@ -5,8 +5,7 @@ The Android Freemium Library is a library that aims to help you put up a freemiu
 
 ##What is a Freemium Business Model?
 What I mean by Freemium Business Model is to propose users to use features from your apps for free,
-but will have to pay to use advanced features. They can also be shown ads when they are not premium
-- it's up to you.
+but will have to pay to use advanced features. They can also be shown ads when they are not premium - it's up to you.
 
 ##How does this library helps?
 This library implements and simplifies multiple functionalities that would be useful to you.
@@ -15,21 +14,24 @@ It also implements the **AdMob** library that can be used to show ads to the use
 
 
 ##How to use the library?
-To use the library you need to create a class instance of a PremiumManager. It's advised to do so in the `onCreate` or `onResume()` call of your activity.
+To use the library you need to create a class instance of a PremiumManager. It's advised to do so in `onResume()`,
+after setting up the content view of your activity.
 
 ```java
         this.mPremiumManager = new PremiumManager(this,getString(R.string.premium_sku),getString(R.string.appPublicKey), getString(R.string.adKey), testDevices);
 ```
 
-The PremiumManager constructor will take a few arguments: the premium "sku" id of your Google Play upgrade package.
-Your app Public Key that you can find on the Google Play store [1].
-Your AdMob key, so that it can show ads to the user, and a list of test devices for AdMob.
+The PremiumManager constructor will take a few arguments:
+* the premium "sku" id of your Google Play upgrade package.
+* Your app's licence Public Key that you can find on the Google Play store *(in Services and API)*.
+* Your AdMob key, so that it can show ads to the user
+* And a Set of test devices for AdMob.
 
 To catch the return intent of the in-app payment, you will also need to implement the onActivityResult of your application and call the handleResult of your PremiumManager.
 
 ```java
     @Override
-    protected void onActivityResult(int requestCode,int resultCode, Intent intent) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         if(!(mPremiumManager != null && mPremiumManager.handleResult(requestCode, resultCode, intent))) {
             Log.v(TAG, "Activity result not handled by PremiumManager");
             //Handle your own results...
@@ -50,7 +52,7 @@ Finally, you'll have to clean the PremiumManager in your activity's onDestroy ca
 Once your premium manager and your activity are set up, you will be able to select the features you want to use.
 
 ### Showing Ads when the user is not premium
-To show ads for a non-premium user, you just need to call the PremiumManager's `doAdsForNonPremium()` method.
+To show ads for a non-premium user, you just need to set it up via the PremiumManager's `doAdsForNonPremium` method.
 
 ```java
 	    this.mPremiumManager.doAdsForNonPremium(R.id.adView, true, R.layout.ads_replacement_default);
@@ -96,22 +98,15 @@ This method will require the following arguments:
 ## More advanced use.
 You also have access to other methods that could be useful in other cases.
 
-```java
-public boolean isPremium()
-```
-will tell you if the user is premium or not. Thanks to it, you will be able to select features you want to activate only for premium users.
+`public boolean isPremium()` will tell you if the user is premium or not. Thanks to it, you will be able to select features you want to activate only for premium users.
 
-```java
-public static boolean getPremiumFromPrefs(Context c)
-```
-will let you get the premium information for the preferences.
+`public static boolean getPremiumFromPrefs(Context c)` will let you get the premium information for the preferences.
 It could be useful to use it in a widget or somewhere you don't want to instance a PremiumManager.
 
-Finally,
-```
-java public boolean isInAppBillingSupported()
-```
-will tell you whether or not the user's device support InAppBilling.
+`public boolean isInAppBillingSupported()` will tell you whether or not the user's device support InAppBilling.
+
+
+Feel free to check the javadoc if you require more information.
 
 ##Use case.
 The library is currently used in my HabitRPG application. You can find it on the [Google Play Store](https://play.google.com/store/apps/details?id=com.magicmicky.habitrpgmobileapp)
