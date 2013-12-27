@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
@@ -55,7 +57,7 @@ public class PremiumManager {
 	 */
 	private boolean mPremiumMenuButton =false;
 	private Menu mMenu;
-	private int mMenuButtonTextResource;
+	private String mMenuButtonText;
 
 	/*
 	 * Other
@@ -109,12 +111,10 @@ public class PremiumManager {
 
 			}
 		});
-
-
 	}
 
 	/**
-	 * Is the user in premium mode?
+	 * Check if the user is premium or not.
 	 * @return true if the user is a premium user, false otherwise
 	 */
 	public boolean isPremium() {
@@ -124,6 +124,7 @@ public class PremiumManager {
 		return mIsPremium;
 	}
 	/**
+     * Check if in-app billing is supported for this device.
 	 * @return is in app billing supported for this device?
 	 */
 	public boolean isInAppBillingSupported() {
@@ -134,60 +135,17 @@ public class PremiumManager {
 	 * Show ads for non-premium users.
 	 * @param adsViewGroupRes the Res reference to the container of your ads.
 	 * @param upgradeLinkOnFailure whether or not you want to have an "upgrade" link if the ad requests fail (i.e. the user has an ad blocker, or don't have internet)
-	 * @param adsReplacementLayoutRes the resources to the layout you want to use when you can't show ads. Put 0 to use the default one.
+	 * @param adsReplacementLayoutRes the resources linking to the layout you want to use when you can't show ads. Put 0 to use the default one.
 	 */
 	public void doAdsForNonPremium(int adsViewGroupRes, boolean upgradeLinkOnFailure, int adsReplacementLayoutRes) {
-		this.mDoAds = true;
+        Log.d(TAG + "_ads", "Editing ads info.");
+        this.mDoAds = true;
 		this.mAdsContainerRes = adsViewGroupRes;
 		this.mUpgradeLinkOnFailure = upgradeLinkOnFailure;
 		this.mAdsReplacementLayoutRes = adsReplacementLayoutRes;
         this.showAdsForNonPremium();
 	}
 
-    /**
-     * Display the ads configured by {@code doAdsForNonPremium()} or hide the container if the user is premium
-     * @see com.magicmicky.freemiumlibrary.PremiumManager#doAdsForNonPremium(int, boolean, int)
-     */
-	private void showAdsForNonPremium() {
-		ViewGroup adsContainer = (ViewGroup) mActivity.findViewById(mAdsContainerRes);
-		if(!isPremium()) {
-			Log.d(TAG, "user is not premium: instantiating adds");
-			View adsReplacement=null;
-			if (adsContainer == null) {
-				throw (new PremiumModeException.WrongLayoutException(false));
-			}
-			adsContainer.removeAllViews();
-			adsContainer.invalidate();
-			if (mUpgradeLinkOnFailure) {
-				try {
-					adsReplacement = mActivity.getLayoutInflater().inflate(mAdsReplacementLayoutRes, adsContainer, false);
-				} catch(Resources.NotFoundException e) {
-					Log.w(TAG, "Catched Exception while trying to get layout " + mAdsReplacementLayoutRes + ": "+ e.getMessage());
-					e.printStackTrace();
-				}
-				if(adsReplacement==null) {
-					adsReplacement = mActivity.getLayoutInflater().inflate(R.layout.ads_replacement_default,adsContainer, false);
-				}
-				Log.w(TAG + "OMG",  "container has " + adsContainer.getChildCount() + " children");
-				if(adsReplacement!=null && adsContainer.getChildCount()==0) {
-					adsContainer.removeAllViews();
-					adsContainer.addView(adsReplacement);
-					adsReplacement.setOnClickListener(new View.OnClickListener() {
-						@Override public void onClick(View view) {
-							onUpgrade();
-						}
-					});
-				}
-			}
-			AdsInstantiator customAdsInstantiator = new AdsInstantiator(mActivity,mAdUnitId, adsReplacement, mTestDevices);
-			adsContainer.setVisibility(View.VISIBLE);
-			customAdsInstantiator.addAdsTo(adsContainer);
-		} else {
-			hideAdsContainer();
-		}
-
-
-	}
 	/**
 	 * Show a "Upgrade to Premium" button for non premium users
 	 * @param drawerButtonViewGroupRes the Resource Layout for the button container
@@ -195,95 +153,181 @@ public class PremiumManager {
 	 * @throws PremiumModeException.WrongLayoutException
 	 */
 	public void doUpgradeButtonForNonPremium(int drawerButtonViewGroupRes, int drawerButtonLayoutReference) throws PremiumModeException.WrongLayoutException{
+        Log.v(TAG + "_upgradeButton", "Editing info about the upgrade normal button.");
 		this.mDrawerButton = true;
 		this.mDrawerButtonContainerRes = drawerButtonViewGroupRes;
 		this.mDrawerButtonLayoutReference = drawerButtonLayoutReference;
         showUpgradeButtonForNonPremium();
 	}
 
+	/**
+	 * Show an "Upgrade to premium" button in the menu.
+	 * @param menu the menu instance to modify.
+	 * @param menuButtonText the text to show in the menu. 0 for default value
+	 */
+	public void doMenuButtonForNonPremium(Menu menu, String menuButtonText) {
+        Log.v(TAG+"_menuButton", "Editing upgrade menu button info.");
+		this.mPremiumMenuButton = true;
+		this.mMenu = menu;
+        this.mMenuButtonText = menuButtonText;
+        this.showPremiumButtonInMenu();
+    }
+
+    /**
+     * Clean everything. Should be called in your activities onDestroy()
+     */
+    public void clean() {
+        Log.d(TAG, "Destroying helper.");
+        if (mHelper != null) mHelper.dispose();
+        mHelper = null;
+
+    }
+
+
+
+
+    /**
+     * This method needs to be called from your onActivityResult so that the transaction can happen.
+     * @param requestCode the requestCode from Activity#onActivityResult
+     * @param resultCode the resultCode from Activity#onActivityResult
+     * @param data the data from Activity#onActivityResult
+     * @return Returns true if the result was related to a purchase flow and was handled; false if the result was not related to a purchase, in which case you should handle it normally.
+     */
+    public boolean handleResult(int requestCode, int resultCode, Intent data) {
+        Log.d(TAG, "onActivityResult(" + requestCode + "," + resultCode + "," + data);
+
+        // Pass on the activity result to the helper for handling
+        // not handled, so handle it ourselves (here's where you'd
+        // perform any handling of activity results not related to in-app
+        // billing...
+        //mActivity.onActivityResult(requestCode, resultCode, data);
+        return !mHelper.handleActivityResult(requestCode, resultCode, data);
+    }
+
+    /**
+     * Retrieve whether or not the user is premium from the preferences
+     * @param c the current context
+     * @return whether or not the user is premium
+     */
+    public static boolean getPremiumFromPrefs(Context c) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
+        return prefs.getBoolean(c.getString(R.string.SP_is_premium),false);
+    }
+
+    /**
+     * Display the ads configured by {@code doAdsForNonPremium()} or hide the container if the user is premium
+     * @see com.magicmicky.freemiumlibrary.PremiumManager#doAdsForNonPremium(int, boolean, int)
+     */
+    private void showAdsForNonPremium() {
+        ViewGroup adsContainer = (ViewGroup) mActivity.findViewById(mAdsContainerRes);
+        if(!isPremium()) {
+            Log.d(TAG + "_ads", "Showing ads.");
+            View adsReplacement=null;
+            if (adsContainer == null) {
+                throw (new PremiumModeException.WrongLayoutException(false));
+            }
+            adsContainer.removeAllViews();
+            adsContainer.invalidate();
+            if (mUpgradeLinkOnFailure) {
+                try {
+                    adsReplacement = mActivity.getLayoutInflater().inflate(mAdsReplacementLayoutRes, adsContainer, false);
+                } catch(Resources.NotFoundException e) {
+                    Log.w(TAG, "Catched Exception while trying to get layout " + mAdsReplacementLayoutRes + ": "+ e.getMessage());
+                    e.printStackTrace();
+                }
+                if(adsReplacement==null) {
+                    adsReplacement = mActivity.getLayoutInflater().inflate(R.layout.ads_replacement_default,adsContainer, false);
+                }
+                Log.w(TAG + "OMG",  "container has " + adsContainer.getChildCount() + " children");
+                if(adsReplacement!=null && adsContainer.getChildCount()==0) {
+                    adsContainer.removeAllViews();
+                    adsContainer.addView(adsReplacement);
+                    adsReplacement.setOnClickListener(new View.OnClickListener() {
+                        @Override public void onClick(View view) {
+                            onUpgrade();
+                        }
+                    });
+                }
+            }
+            AdsInstantiator customAdsInstantiator = new AdsInstantiator(mActivity,mAdUnitId, adsReplacement, mTestDevices);
+            adsContainer.setVisibility(View.VISIBLE);
+            customAdsInstantiator.addAdsTo(adsContainer);
+        } else {
+            Log.d(TAG + "_ads", "Hiding ads container.");
+            hideAdsContainer();
+        }
+
+
+    }
+
     /**
      * Display or not the configured Upgrade button of the user.
      * @see #doUpgradeButtonForNonPremium(int, int)
      */
-	private void showUpgradeButtonForNonPremium() {
-		if(!isPremium()) {
-			ViewGroup messageContainer = (ViewGroup) mActivity.findViewById(mDrawerButtonContainerRes);
-			if(messageContainer== null) {
-				throw(new PremiumModeException.WrongLayoutException(true));
-			}
-			messageContainer.removeAllViews();
-			View upgradeMessage =null;
-			try {
-				upgradeMessage = mActivity.getLayoutInflater().inflate(mDrawerButtonLayoutReference, messageContainer, false);
+    private void showUpgradeButtonForNonPremium() {
+        if(!isPremium() && isInAppBillingSupported()) {
+            Log.d(TAG + "_upgradeButton", "Showing upgrade normal button.");
+            ViewGroup messageContainer = (ViewGroup) mActivity.findViewById(mDrawerButtonContainerRes);
+            if(messageContainer== null) {
+                throw(new PremiumModeException.WrongLayoutException(true));
+            }
+            messageContainer.removeAllViews();
+            View upgradeMessage =null;
+            try {
+                upgradeMessage = mActivity.getLayoutInflater().inflate(mDrawerButtonLayoutReference, messageContainer, false);
 
-			} catch(Resources.NotFoundException e) {
-				Log.w(TAG, "Catched Exception while trying to get layout " + mAdsReplacementLayoutRes + ": "+ e.getMessage());
-				e.printStackTrace();
-			}
-			if(upgradeMessage==null) {
-				upgradeMessage = mActivity.getLayoutInflater().inflate(R.layout.drawer_update_to_premium_default, messageContainer, false);
-			}
+            } catch(Resources.NotFoundException e) {
+                Log.w(TAG, "Catched Exception while trying to get layout " + mAdsReplacementLayoutRes + ": "+ e.getMessage());
+                e.printStackTrace();
+            }
+            if(upgradeMessage==null) {
+                upgradeMessage = mActivity.getLayoutInflater().inflate(R.layout.drawer_update_to_premium_default, messageContainer, false);
+            }
 
-			if(upgradeMessage!=null && messageContainer.getChildCount() == 0) {
-				messageContainer.addView(upgradeMessage);
+            if(upgradeMessage!=null && messageContainer.getChildCount() == 0) {
+                messageContainer.addView(upgradeMessage);
 
-				upgradeMessage.setOnClickListener(new View.OnClickListener() {
-					@Override public void onClick(View view) {
-						onUpgrade();
-					}
-				});
-			}
-		} else {
-			hideUpgradeButtonContainer();
-		}
+                upgradeMessage.setOnClickListener(new View.OnClickListener() {
+                    @Override public void onClick(View view) {
+                        onUpgrade();
+                    }
+                });
+            }
+        } else {
+            Log.d(TAG + "_upgradeButton", "Hiding upgrade normal button.");
+            hideUpgradeButtonContainer();
+        }
 
-	}
-
-	/**
-	 * Show an "Upgrade to premium" button in the menu.
-	 * @param menu the menu instance to modify.
-	 * @param menuButtonTextResource the text to show in the menu. 0 for default value
-	 */
-	public void doPremiumButtonInMenu(Menu menu, int menuButtonTextResource) {
-		this.mPremiumMenuButton = true;
-		this.mMenu = menu;
-       this.mMenuButtonTextResource = menuButtonTextResource;
     }
 
     /**
      * Display a menu premium asking the user to upgrade to premium. The menu button should be set up with {@code doPremiumButtonInMenu}
-     * @see #doPremiumButtonInMenu(android.view.Menu, int)
+     * @see #doMenuButtonForNonPremium(android.view.Menu, java.lang.String)
      */
     private void showPremiumButtonInMenu() {
-		if(!isPremium() && isInAppBillingSupported() && this.mMenu.findItem(MENU_PREMIUM)==null) {
-			MenuItem updateMenuItem;
-			if(mMenuButtonTextResource==0) {
-				updateMenuItem = this.mMenu.add(0, MENU_PREMIUM, 0, this.mMenuButtonTextResource);
-			} else {
-				updateMenuItem= this.mMenu.add(0, MENU_PREMIUM, 0, R.string.action_premium);
-			}
+        if(!isPremium() && isInAppBillingSupported()) {
+            Log.d(TAG+"_menuButton","Showing upgrade menu button.");
+            if(this.mMenu.findItem(MENU_PREMIUM)==null) {
+                MenuItem updateMenuItem;
+                if(mMenuButtonText!=null) {
+                    updateMenuItem = this.mMenu.add(0, MENU_PREMIUM, 0, this.mMenuButtonText);
+                } else {
+                    updateMenuItem= this.mMenu.add(0, MENU_PREMIUM, 0, R.string.action_premium);
+                }
 
-			updateMenuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-				@Override
-				public boolean onMenuItemClick(MenuItem item) {
-					onUpgrade();
-					return false;
-				}
-			});
-		} else {
-			mMenu.removeItem(MENU_PREMIUM);
-		}
-	}
-
-	/**
-	 * Clean everything. Should be called in your activities onDestroy()
-	 */
-	public void clean() {
-		Log.d(TAG, "Destroying helper.");
-		if (mHelper != null) mHelper.dispose();
-		mHelper = null;
-
-	}
+                updateMenuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        onUpgrade();
+                        return false;
+                    }
+                });
+            }
+        } else {
+            Log.d(TAG+"_menuButton","Removing upgrade menu button");
+            mMenu.removeItem(MENU_PREMIUM);
+        }
+    }
 
 	/**
      * This is the method called after the user upgraded, or when we have a result from the
@@ -339,15 +383,17 @@ public class PremiumManager {
 	 * Launch the Upgrade workflow
 	 * @throws PremiumModeException.PremiumPackageIdError
 	 */
-	protected void onUpgrade() throws PremiumModeException.PremiumPackageIdError{
-		if(mSkuPremium ==null) {
-			throw new PremiumModeException.PremiumPackageIdError();
-		}
+    protected void onUpgrade() throws PremiumModeException.PremiumPackageIdError{
+        if(this.isInAppBillingSupported()) {
+            if(mSkuPremium ==null) {
+                throw new PremiumModeException.PremiumPackageIdError();
+            }
 
-		Log.d(TAG, "Upgrade button clicked; launching purchase flow for upgrade.");
-		mHelper.launchPurchaseFlow(mActivity, mSkuPremium, RC_REQUEST,
-				mPurchaseFinishedListener, "");
-	}
+            Log.d(TAG, "Upgrade button clicked; launching purchase flow for upgrade.");
+            mHelper.launchPurchaseFlow(mActivity, mSkuPremium, RC_REQUEST,
+                    mPurchaseFinishedListener, "");
+        }
+    }
 
 
 	/**
@@ -374,10 +420,9 @@ public class PremiumManager {
 	};
 
 	/**
-	 * Listener that's called when we finish querying the items and subscriptions we own
+	 * Listener that is called when we finish querying the items and subscriptions we own
 	 */
 	private final IabHelper.QueryInventoryFinishedListener mGotInventoryListener = new IabHelper.QueryInventoryFinishedListener() {
-
 		public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
 			Log.d(TAG, "Query inventory finished.");
 			if (result.isFailure()) {
@@ -385,14 +430,17 @@ public class PremiumManager {
 				return;
 			}
 			Log.d(TAG, "Query inventory was successful.");
-
-			// Do we have the premium upgrade?
-			Purchase premiumPurchase = inventory.getPurchase(mSkuPremium);
-			mIsPremium = (premiumPurchase != null);
-			Log.d(TAG, "User is " + (mIsPremium ? "PREMIUM" : "NOT PREMIUM") + ". Updating prefs.");
-			updatePremium(mIsPremium);
-			Log.d(TAG, "Initial inventory query finished;");
-		}
+            if(isNetworkAvailable()) {
+                // Do we have the premium upgrade?
+                Purchase premiumPurchase = inventory.getPurchase(mSkuPremium);
+                mIsPremium = (premiumPurchase != null);
+                Log.d(TAG, "User is " + (mIsPremium ? "PREMIUM" : "NOT PREMIUM") + ". Updating prefs.");
+                updatePremium(mIsPremium);
+                Log.d(TAG, "Initial inventory query finished;");
+            } else {
+                Log.d(TAG, "Network not available. No update of the user status");
+            }
+        }
 	};
 
 
@@ -405,33 +453,14 @@ public class PremiumManager {
 		return getPremiumFromPrefs(mActivity);
 	}
 
-	/**
-	 * Retrieve whether or not the user is premium from the preferences
-	 * @param c the current context
-	 * @return whether or not the user is premium
-	 */
-	public static boolean getPremiumFromPrefs(Context c) {
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
-		return prefs.getBoolean(c.getString(R.string.SP_is_premium),false);
 
-	}
-
-	/**
-	 * This method needs to be called from your onActivityResult so that the transaction can happen.
-	 * @param requestCode the requestCode from Activity#onActivityResult
-	 * @param resultCode the resultCode from Activity#onActivityResult
-	 * @param data the data from Activity#onActivityResult
-	 * @return Returns true if the result was related to a purchase flow and was handled; false if the result was not related to a purchase, in which case you should handle it normally.
-	 */
-	public boolean handleResult(int requestCode, int resultCode, Intent data) {
-		Log.d(TAG, "onActivityResult(" + requestCode + "," + resultCode + "," + data);
-
-		// Pass on the activity result to the helper for handling
-		// not handled, so handle it ourselves (here's where you'd
-		// perform any handling of activity results not related to in-app
-		// billing...
-		//mActivity.onActivityResult(requestCode, resultCode, data);
-		return !mHelper.handleActivityResult(requestCode, resultCode, data);
-	}
-
+    /**
+     * Checks if the network is available.
+     * @return the network availability
+     */
+    private boolean isNetworkAvailable() {
+        ConnectivityManager cm = (ConnectivityManager) mActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo ninfo = cm.getActiveNetworkInfo();
+        return ninfo != null && ninfo.isConnected();
+    }
 }
