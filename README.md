@@ -71,12 +71,14 @@ This method takes the following arguments
 You can also show an upgrade button in the menu. It will be available on pre and post honeycomb menu style.
 You just need to call `doPremiumButtonInMenu` in your Activity's onPrepareOptionsMenu
 
+```java
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         if(this.mPremiumManager!=null)
             this.mPremiumManager.doPremiumButtonInMenu(menu, R.string.action_premium);
         return super.onPrepareOptionsMenu(menu);
     }
+```
 
 This method will require the following arguments:
 * The Menu where the new item should be created
