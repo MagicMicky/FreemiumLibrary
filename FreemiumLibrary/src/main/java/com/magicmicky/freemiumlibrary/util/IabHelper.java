@@ -73,7 +73,7 @@ import java.util.List;
 public class IabHelper {
     // Is debug logging enabled?
     boolean mDebugLog = false;
-    String mDebugTag = "IabHelper";
+    String mDebugTag = "FreemiumLibrary/IabHelper";
 
     // Is setup done?
     boolean mSetupDone = false;

@@ -17,7 +17,7 @@ import java.util.Set;
  * @author Mickael Goubin
  */
 public class AdsInstantiator implements AdListener {
-    private static final String TAG = "AdsInstantiator";
+    private static final String TAG = "FreemiumLibrary/AdsInstantiator";
     private final Activity mContext;
     private final String mAdUnitId;
     private final Set<String> mTestDevices;

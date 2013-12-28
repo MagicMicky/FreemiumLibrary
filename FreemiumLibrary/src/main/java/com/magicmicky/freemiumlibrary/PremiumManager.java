@@ -30,7 +30,7 @@ import java.util.Set;
 public class PremiumManager {
 
 	private static final int MENU_PREMIUM = Menu.FIRST + 100;
-	private static final String TAG = "UpdateToPremiumAct";
+	private static final String TAG = "FreemiumLibrary/PremiumManager";
 	//private final String developerPayLoad="";
 	private IabHelper mHelper;
 	private static final int RC_REQUEST = 10001;
@@ -138,7 +138,7 @@ public class PremiumManager {
 	 * @param adsReplacementLayoutRes the resources linking to the layout you want to use when you can't show ads. Put 0 to use the default one.
 	 */
 	public void doAdsForNonPremium(int adsViewGroupRes, boolean upgradeLinkOnFailure, int adsReplacementLayoutRes) {
-        Log.d(TAG + "_ads", "Editing ads info.");
+        Log.v(TAG + "_ads", "Editing ads info.");
         this.mDoAds = true;
 		this.mAdsContainerRes = adsViewGroupRes;
 		this.mUpgradeLinkOnFailure = upgradeLinkOnFailure;
@@ -438,9 +438,9 @@ public class PremiumManager {
             if(isNetworkAvailable()) {
                 // Do we have the premium upgrade?
                 Purchase premiumPurchase = inventory.getPurchase(mSkuPremium);
-                mIsPremium = (premiumPurchase != null);
-                Log.d(TAG, "User is " + (mIsPremium ? "PREMIUM" : "NOT PREMIUM") + ". Updating prefs.");
-                updatePremium(mIsPremium);
+                boolean isPremium = (premiumPurchase != null);
+                Log.d(TAG, "User is " + (isPremium ? "PREMIUM" : "NOT PREMIUM") + ". Updating prefs.");
+                updatePremium(isPremium);
                 Log.d(TAG, "Initial inventory query finished;");
             } else {
                 Log.d(TAG, "Network not available. No update of the user status");
