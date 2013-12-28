@@ -338,6 +338,12 @@ public class PremiumManager {
 	private void updatePremium(boolean isPremium) {
         //If the user's status changed, we need to hide/show the different stuff of the user.
         if(this.mIsPremium != isPremium) {
+            Log.v(TAG+"_updatePrefs", "Updating prefs: user is " + (isPremium ? "" : "not") + " Premium");
+            this.mIsPremiumInitialized=true;
+            this.mIsPremium=isPremium;
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mActivity);
+            prefs.edit().putBoolean(mActivity.getString(R.string.SP_is_premium),isPremium).commit();
+
             if(this.mPremiumMenuButton) {
                 showPremiumButtonInMenu();
             }
@@ -347,13 +353,12 @@ public class PremiumManager {
             if(this.mDoAds) {
                 showAdsForNonPremium();
             }
+        } else {
+            this.mIsPremiumInitialized=true;
+            this.mIsPremium=isPremium;
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mActivity);
+            prefs.edit().putBoolean(mActivity.getString(R.string.SP_is_premium),isPremium).commit();
         }
-
-        this.mIsPremiumInitialized=true;
-        this.mIsPremium=isPremium;
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mActivity);
-        prefs.edit().putBoolean(mActivity.getString(R.string.SP_is_premium),isPremium).commit();
-
     }
 
 
