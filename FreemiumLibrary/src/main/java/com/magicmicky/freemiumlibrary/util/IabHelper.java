@@ -478,7 +478,9 @@ public class IabHelper {
                 String sku = purchase.getSku();
 
                 // Verify signature
-                if (!Security.verifyPurchase(sku, mSignatureBase64, purchaseData, dataSignature)) {
+                if ((!sku.equals("android.test.purchased") && !sku.equals("android.test.canceled")
+                        && !sku.equals("android.test.refunded") && !sku.equals("android.test.item_unavailable")
+                ) && !Security.verifyPurchase(mSignatureBase64, purchaseData, dataSignature)) {
                     logError("Purchase signature verification FAILED for sku " + sku);
                     result = new IabResult(IABHELPER_VERIFICATION_FAILED, "Signature verification failed for sku " + sku);
                     if (mPurchaseListener != null) mPurchaseListener.onIabPurchaseFinished(result, purchase);
@@ -868,7 +870,9 @@ public class IabHelper {
                 String purchaseData = purchaseDataList.get(i);
                 String signature = signatureList.get(i);
                 String sku = ownedSkus.get(i);
-                if (Security.verifyPurchase(sku, mSignatureBase64, purchaseData, signature)) {
+                if ((sku.equals("android.test.purchased") || sku.equals("android.test.canceled")
+                        || sku.equals("android.test.refunded") || sku.equals("android.test.item_unavailable")
+                ) || Security.verifyPurchase(mSignatureBase64, purchaseData, signature)) {
                     logDebug("Sku is owned: " + sku);
                     Purchase purchase = new Purchase(itemType, purchaseData, signature);
 
