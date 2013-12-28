@@ -14,6 +14,8 @@ It also implements the **AdMob** library that can be used to show ads to the use
 
 
 ##How to use the library?
+First of all you'll need to import the library to your projects. The project has been developped using Android Studio but should be easily usable in Idea, or Eclipse. You just need to import the content of the `FreemiumLibrary` as a new module/library.
+
 To use the library you need to create a class instance of a PremiumManager. It's advised to do so in `onResume()`,
 after setting up the content view of your activity.
 
