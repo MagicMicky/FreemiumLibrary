@@ -33,7 +33,8 @@ public class PremiumManager {
 	private static final String TAG = "FreemiumLibrary/PremiumManager";
 	//private final String developerPayLoad="";
 	private IabHelper mHelper;
-	private static final int RC_REQUEST = 10001;
+	private static final int RC_REQUEST = 11337;
+
 
 	/*
 	 * Drawer
@@ -395,8 +396,20 @@ public class PremiumManager {
             }
 
             Log.d(TAG, "Upgrade button clicked; launching purchase flow for upgrade.");
-            mHelper.launchPurchaseFlow(mActivity, mSkuPremium, RC_REQUEST,
-                    mPurchaseFinishedListener, "");
+            try {
+                mHelper.launchPurchaseFlow(mActivity, mSkuPremium, RC_REQUEST,
+                        mPurchaseFinishedListener, "");
+            } catch (IllegalStateException e) {
+                if(e.getMessage().startsWith("Can't start async operation") && e.getMessage().endsWith("is in progress.")) {
+                    Log.d(TAG, "the helper seemed to be doing some work in background. Stopping it and launching the purchase flow again");
+                    mHelper.flagEndAsync();
+                    mHelper.launchPurchaseFlow(mActivity, mSkuPremium, RC_REQUEST,
+                            mPurchaseFinishedListener, "");
+
+                } else {
+                    throw e;
+                }
+            }
         }
     }
 
