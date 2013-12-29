@@ -12,15 +12,21 @@ public class PremiumModeException extends RuntimeException {
 
 	public static class WrongLayoutException extends PremiumModeException {
 
-		public WrongLayoutException(boolean isUpdateButton) {
-			super(isUpdateButton  ? ("The resource given wasn't found") : ("No layout were found for the ads"));
+		public WrongLayoutException() {
+			super("The layout given wasn't found");
 		}
 	}
+    public static class ViewNotFoundException extends PremiumModeException {
+
+        public ViewNotFoundException() {
+            super("The resource given isn't found");
+        }
+    }
 
 	public static class PremiumPackageIdError extends PremiumModeException {
 
 		public PremiumPackageIdError() {
-			super("The premium in-app package isn't set. Please use #setPremiumPackageSKU");
+			super("The premium in-app package is null ");
 		}
 	}
 }
