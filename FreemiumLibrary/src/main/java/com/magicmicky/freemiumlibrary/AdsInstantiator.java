@@ -37,14 +37,9 @@ public class AdsInstantiator implements AdListener {
         View v = mContainer.findViewById(R.id.ad_banner);
         if(v==null) {
 
-            //LayoutInflater inflater = LayoutInflater.from(mContext);
-            //mAd = (AdView) inflater.inflate(R.layout.ads, container, false);
             AdView ad = new AdView(mContext,AdSize.BANNER, mAdUnitId);
+            ad.setId(R.id.ad_banner);
 
-			/*if(mAd!=null) {
-				//mAd.setAdListener(this);
-				container.addView(mAd);
-			}*/
             container.removeAllViews();
             ad.setAdListener(this);
             AdRequest request = new AdRequest();
