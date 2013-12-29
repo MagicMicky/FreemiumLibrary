@@ -12,7 +12,7 @@ This library implements and simplifies multiple functionalities that would be us
 It implements the **in-app billing v3** used to charge user via the Google Play Store.
 It also implements the **AdMob** library that can be used to show ads to the user when he is not premium.
 
-##Prepare your application to use the library
+##Prepare your application
 First of all, you will need to create your application's project in the Play Store developer console,
 and create a **"managed"** in-app product (See *Yourapp > In app products > Add new product*).
 You will also need to note the **Licnese key** of your application which is listed in the "Services & APIs" in the Developer Console.
