@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
@@ -39,9 +38,9 @@ public class PremiumManager {
 	/*
 	 * Drawer
 	 */
-	private boolean mDrawerButton =false;
-	private int mDrawerButtonContainerRes;
-	private int mDrawerButtonLayoutReference;
+	private boolean mUpgradeButton =false;
+	private int mUpgradeButtonContainerRes;
+	private int mUpgradeButtonLayoutReference;
 
 	/*
 	 * Ads
@@ -163,19 +162,19 @@ public class PremiumManager {
 
 	/**
 	 * Show a "Upgrade to Premium" button for non premium users
-	 * @param drawerButtonViewGroupRes the Resource Layout for the button container
-	 * @param drawerButtonLayoutReference the Resource Layout for the button. Will be ignored if you want default look.
+	 * @param upgradeButtonViewGroupRes the Resource Layout for the button container
+	 * @param upgradeButtonLayoutReference the Resource Layout for the button. Will be ignored if you want default look.
 	 * @throws PremiumModeException.WrongLayoutException
 	 */
-	public void doUpgradeButtonForNonPremium(int drawerButtonViewGroupRes, int drawerButtonLayoutReference) throws PremiumModeException {
-        if(this.mActivity.findViewById(drawerButtonViewGroupRes)==null)
+	public void doUpgradeButtonForNonPremium(int upgradeButtonViewGroupRes, int upgradeButtonLayoutReference) throws PremiumModeException {
+        if(this.mActivity.findViewById(upgradeButtonViewGroupRes)==null)
             throw new PremiumModeException.ViewNotFoundException();
-        if(this.mActivity.getResources().getLayout(drawerButtonLayoutReference)==null)
+        if(this.mActivity.getResources().getLayout(upgradeButtonLayoutReference)==null)
             throw new PremiumModeException.WrongLayoutException();
         Log.v(TAG + "_upgradeButton", "Editing info about the upgrade normal button.");
-		this.mDrawerButton = true;
-		this.mDrawerButtonContainerRes = drawerButtonViewGroupRes;
-		this.mDrawerButtonLayoutReference = drawerButtonLayoutReference;
+		this.mUpgradeButton = true;
+		this.mUpgradeButtonContainerRes = upgradeButtonViewGroupRes;
+		this.mUpgradeButtonLayoutReference = upgradeButtonLayoutReference;
         showUpgradeButtonForNonPremium();
 	}
 
@@ -272,10 +271,10 @@ public class PremiumManager {
     private void showUpgradeButtonForNonPremium() {
         if(!isPremium() && isInAppBillingSupported()) {
             Log.d(TAG + "_upgradeButton", "Showing upgrade normal button.");
-            ViewGroup messageContainer = (ViewGroup) mActivity.findViewById(mDrawerButtonContainerRes);
+            ViewGroup messageContainer = (ViewGroup) mActivity.findViewById(mUpgradeButtonContainerRes);
             messageContainer.removeAllViews();
             View upgradeMessage =null;
-            upgradeMessage = mActivity.getLayoutInflater().inflate(mDrawerButtonLayoutReference, messageContainer, false);
+            upgradeMessage = mActivity.getLayoutInflater().inflate(mUpgradeButtonLayoutReference, messageContainer, false);
             messageContainer.addView(upgradeMessage);
             upgradeMessage.setOnClickListener(new View.OnClickListener() {
                 @Override public void onClick(View view) {
@@ -335,7 +334,7 @@ public class PremiumManager {
 
             if(this.mPremiumMenuButton)
                 showPremiumButtonInMenu();
-            if(this.mDrawerButton)
+            if(this.mUpgradeButton)
                 showUpgradeButtonForNonPremium();
             if(this.mDoAds)
                 showAdsForNonPremium();
@@ -367,7 +366,7 @@ public class PremiumManager {
 	 * Hide the Upgrade button container
 	 */
 	protected  void hideUpgradeButtonContainer() {
-		mActivity.findViewById(this.mDrawerButtonContainerRes).setVisibility(View.GONE);
+		mActivity.findViewById(this.mUpgradeButtonContainerRes).setVisibility(View.GONE);
 	}
 
 	/**
