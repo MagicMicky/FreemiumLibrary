@@ -239,7 +239,6 @@ public class PremiumManager {
                 if(adsReplacement==null) {
                     adsReplacement = mActivity.getLayoutInflater().inflate(R.layout.ads_replacement_default,adsContainer, false);
                 }
-                Log.w(TAG + "OMG",  "container has " + adsContainer.getChildCount() + " children");
                 if(adsReplacement!=null && adsContainer.getChildCount()==0) {
                     adsContainer.removeAllViews();
                     adsContainer.addView(adsReplacement);
