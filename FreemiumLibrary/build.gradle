@@ -21,3 +21,5 @@ android {
     buildToolsVersion "18.0.1"
 
 }
+
+apply from: '../maven_push.gradle'
