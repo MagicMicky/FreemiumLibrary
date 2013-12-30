@@ -25,6 +25,25 @@ If you are using **Android Studio** I'm trying to push the library to Maven Cent
 have to add a depency in your build.gradle, but currently, you can see [this stackoverflow answer](http://stackoverflow.com/a/16639227/1376834)
 on how to import library projects via Android Studio
 
+###Your App's Manifest
+You also need to tweak a little your App's AndroidManifest.xml to add the library's permissions and activity.
+At the top level of your manifest, just add
+
+```xml
+	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+	<uses-permission android:name="android.permission.INTERNET"/>
+	<uses-permission android:name="com.android.vending.BILLING" />
+```
+
+And declare the following Activity:
+```xml
+		<activity
+				android:name="com.google.ads.AdActivity"
+				android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" >
+		</activity>
+```
+
+
 ##How to use the library?
 To use the library you need to create an instance of a PremiumManager. It's advised to do so in the `onResume()` of your application,
 after setting up the content view of your activity.
@@ -106,7 +125,7 @@ You just need to call `doPremiumButtonInMenu` in your Activity's onPrepareOption
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         if(this.mPremiumManager!=null)
-            this.mPremiumManager.doPremiumButtonInMenu(menu, getString(R.string.action_premium));
+            this.mPremiumManager.doMenuButtonForNonPremium(menu, getString(R.string.action_premium));
         return super.onPrepareOptionsMenu(menu);
     }
 ```

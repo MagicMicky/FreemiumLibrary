@@ -1,0 +1,27 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.magicmicky.testing.MainActivity"
+    tools:ignore="MergeRootFrame" >
+
+    <LinearLayout
+        android:id="@+id/adView"
+        android:orientation="horizontal"
+        android:layout_width="320dp"
+        android:layout_height="64dp"
+        android:paddingBottom="0dip"
+        android:layout_marginBottom="0dip"
+        android:gravity="center_horizontal"
+        android:layout_gravity="center_horizontal"
+        >
+
+    </LinearLayout>
+    <FrameLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
+
+</LinearLayout>
