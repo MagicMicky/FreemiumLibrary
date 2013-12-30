@@ -17,7 +17,7 @@ import com.magicmicky.freemiumlibrary.PremiumManager;
 import java.util.HashSet;
 
 public class MainActivity extends ActionBarActivity {
-    private PremiumManager mPremiumManager;
+    private static PremiumManager mPremiumManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,7 +77,7 @@ public class MainActivity extends ActionBarActivity {
     /**
      * A placeholder fragment containing a simple view.
      */
-    public class PlaceholderFragment extends Fragment {
+    static public class PlaceholderFragment extends Fragment {
 
         public PlaceholderFragment() {
         }
