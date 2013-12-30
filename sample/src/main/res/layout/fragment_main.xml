@@ -9,10 +9,6 @@
     android:orientation="vertical"
     tools:context="com.magicmicky.testing.MainActivity$PlaceholderFragment">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="OMG"/>
 
     <LinearLayout
         android:id="@+id/upgrade_button"
