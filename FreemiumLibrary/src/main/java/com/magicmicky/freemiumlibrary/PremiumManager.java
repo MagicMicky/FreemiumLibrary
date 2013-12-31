@@ -23,7 +23,8 @@ import com.magicmicky.freemiumlibrary.util.Purchase;
 import java.util.Set;
 
 /**
- * TODO: allow a personalisation of the MenuButton (let the user personalize the icon) see #setPremiumMenuButton
+ * This class allows you to control the Premium features inside your application. You can set up
+ * Ads for non premium, and show different "upgrade" buttons. You also have access to the current status of the user.
  * @author Mickael Goubin
  */
 public class PremiumManager {
@@ -187,7 +188,7 @@ public class PremiumManager {
         Log.v(TAG+"_menuButton", "Editing upgrade menu button info.");
 		this.mPremiumMenuButton = true;
 		this.mMenu = menu;
-        this.mMenuButtonText = menuButtonText;
+        this.mMenuButtonText = menuButtonText;//TODO: the user should be able to customize more than just the text.
         this.showPremiumButtonInMenu();
     }
 
@@ -290,7 +291,7 @@ public class PremiumManager {
 
     /**
      * Display a menu premium asking the user to upgrade to premium. The menu button should be set up with {@code doPremiumButtonInMenu}
-     * @see #doMenuButtonForNonPremium(android.view.Menu, java.lang.String)
+     * @see #doMenuButtonForNonPremium
      */
     private void showPremiumButtonInMenu() {
         if(!isPremium() && isInAppBillingSupported()) {

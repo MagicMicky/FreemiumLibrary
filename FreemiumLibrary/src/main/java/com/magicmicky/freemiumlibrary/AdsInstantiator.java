@@ -14,6 +14,7 @@ import com.google.ads.AdView;
 import java.util.Set;
 
 /**
+ * This class is what instantiates the ads, using the AdMob library
  * @author Mickael Goubin
  */
 public class AdsInstantiator implements AdListener {

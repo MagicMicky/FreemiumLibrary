@@ -1,6 +1,7 @@
 package com.magicmicky.freemiumlibrary;
 
 /**
+ * Custom exceptions thrown by the library
  * @author Mickael Goubin
  */
 public class PremiumModeException extends RuntimeException {
