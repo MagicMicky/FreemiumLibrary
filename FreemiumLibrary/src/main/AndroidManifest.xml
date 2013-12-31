@@ -1,7 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.magicmicky.freemiumlibrary"
-    android:versionCode="10"
-    android:versionName="1.0">
+    package="com.magicmicky.freemiumlibrary">
 
     <uses-sdk android:minSdkVersion="7" android:targetSdkVersion="19" />
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />

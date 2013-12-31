@@ -19,7 +19,13 @@ dependencies {
 android {
     compileSdkVersion 19
     buildToolsVersion "18.0.1"
+    defaultConfig {
+        minSdkVersion 7
+        targetSdkVersion 19
+        versionName project.VERSION_NAME
+        versionCode Integer.parseInt(project.VERSION_CODE)
+    }
 
 }
 
-apply from: '../maven_push.gradle'
+apply from: 'https://raw.github.com/MagicMicky/gradle-mvn-push/master/gradle-mvn-push.gradle'
