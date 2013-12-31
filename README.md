@@ -15,32 +15,30 @@ It also implements the **AdMob** library that can be used to show ads to the use
 ##Prepare your application
 First of all, you will need to create your application's project in the Play Store developer console,
 and create a **"managed"** in-app product (See *Yourapp > In app products > Add new product*).
-You will also need to note the **Licnese key** of your application which is listed in the "Services & APIs" in the Developer Console.
+You will also need to note the **License key** of your application which is listed in the "Services & APIs" in the Developer Console.
 
 You might also want to note your application's ad-unit key (*Monetize > YourApp > Ad Unit ID*)
 
 You will also need to import the library to your application. In **Eclipse**, just
 [import the project as an Android Library project](http://developer.android.com/tools/projects/projects-eclipse.html#ReferencingLibraryProject).
-If you are using **Android Studio** I'm trying to push the library to Maven Central so that you only
-have to add a depency in your build.gradle, but currently, you can see [this stackoverflow answer](http://stackoverflow.com/a/16639227/1376834)
-on how to import library projects via Android Studio
+
+If you are using **Android Studio** and gradle, the easiest way to add the FreemiumLibrary to your project is to add
+the following dependency to your build.gradle:
+
+```
+dependencies {
+    compile 'com.magicmicky.freemiumlibrary:library:+'
+}
+```
 
 ###Your App's Manifest
 You also need to tweak a little your App's AndroidManifest.xml to add the library's permissions and activity.
-At the top level of your manifest, just add
+At the top level of your manifest, simply add
 
 ```xml
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 	<uses-permission android:name="android.permission.INTERNET"/>
 	<uses-permission android:name="com.android.vending.BILLING" />
-```
-
-And declare the following Activity:
-```xml
-		<activity
-				android:name="com.google.ads.AdActivity"
-				android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" >
-		</activity>
 ```
 
 
