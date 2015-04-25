@@ -1,7 +1,9 @@
 FreemiumLibary
 ==============
+**This library hasn't been updated for a while and shouldn't be used as such. Feel free to fork it and update it :)**
 
 The Android Freemium Library is a library that aims to help you put up a freemium model within your android application
+
 
 ##What is a Freemium Business Model?
 What I mean by Freemium Business Model is to propose users to use features from your apps for free,
