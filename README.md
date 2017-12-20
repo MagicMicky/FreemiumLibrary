@@ -5,16 +5,16 @@ FreemiumLibary
 The Android Freemium Library is a library that aims to help you put up a freemium model within your android application
 
 
-##What is a Freemium Business Model?
+## What is a Freemium Business Model?
 What I mean by Freemium Business Model is to propose users to use features from your apps for free,
 but will have to pay to use advanced features. They can also be shown ads when they are not premium - it's up to you.
 
-##How does this library helps?
+## How does this library helps?
 This library implements and simplifies multiple functionalities that would be useful to you.
 It implements the **in-app billing v3** used to charge user via the Google Play Store.
 It also implements the **AdMob** library that can be used to show ads to the user when he is not premium.
 
-##Prepare your application
+## Prepare your application
 First of all, you will need to create your application's project in the Play Store developer console,
 and create a **"managed"** in-app product (See *Yourapp > In app products > Add new product*).
 You will also need to note the **License key** of your application which is listed in the "Services & APIs" in the Developer Console.
@@ -33,7 +33,7 @@ dependencies {
 }
 ```
 
-###Your App's Manifest
+### Your App's Manifest
 You also need to tweak a little your App's AndroidManifest.xml to add the library's permissions and activity.
 At the top level of your manifest, simply add
 
@@ -44,7 +44,7 @@ At the top level of your manifest, simply add
 ```
 
 
-##How to use the library?
+## How to use the library?
 To use the library you need to create an instance of a PremiumManager. It's advised to do so in the `onResume()` of your application,
 after setting up the content view of your activity.
 
@@ -148,14 +148,14 @@ It could be useful to use it in a widget or somewhere you don't want to instance
 
 Feel free to check the javadoc if you require more information.
 
-##Featured projects.
+## Featured projects.
 The library is currently used in my HabitRPG application. You can find it on the [Google Play Store](https://play.google.com/store/apps/details?id=com.magicmicky.habitrpgmobileapp)
 
-##Developped by
+## Developped by
 * Mickael Goubin - [@MagicMicky](http://twitter.com/MagicMicky)
 
 
-##License
+## License
 >Copyright 2014 Mickael Goubin
 >
 >Licensed under the Apache License, Version 2.0 (the "License");
